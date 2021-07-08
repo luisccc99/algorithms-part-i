@@ -7,6 +7,6 @@ public class UnionFindTester {
         System.out.print("number of components: ");
         final int entries = scanner.nextInt();
         UnionFind quickFind = new QuickFind(entries);
-        
+
     }
 }

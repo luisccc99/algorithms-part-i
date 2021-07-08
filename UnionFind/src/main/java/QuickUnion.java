@@ -12,7 +12,7 @@ public class QuickUnion extends UnionFind {
      * @param i element to start with
      * @return the root of i
      */
-    private int root(int i) {
+    protected int root(int i) {
         while (i != id[i]) {
             i = id[i];
         }
