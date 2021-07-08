@@ -1,4 +1,4 @@
-# From https://github.com/github/gitignore/blob/master/Gradle.gitignore
+# Git ignore taken From https://github.com/github/gitignore/blob/master/Gradle.gitignore
 .gradle
 /build/
 
