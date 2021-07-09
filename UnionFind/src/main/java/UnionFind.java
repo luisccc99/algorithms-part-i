@@ -1,13 +1,19 @@
+/**
+ * UnionFind is an abstract class that defines an API for classes.
+ * • Constructor initialize an array (takes N array accesses).
+ */
 public abstract class UnionFind {
 
-    protected int[] id;
-    protected int n;
+    protected final int[] id;
+    protected final int n;
 
     /**
-     * The constructor creates the array and
-     * sets the id of each object to itself
+     * The constructor creates the array and sets the id
+     * of each object to itself.
+     *
+     * @param n specifies the total number of components
      */
-    public UnionFind(int n){
+    public UnionFind(final int n) {
         this.n = n;
         id = new int[n];
         for (int i = 0; i < n; i++) {
@@ -15,7 +21,26 @@ public abstract class UnionFind {
         }
     }
 
-    public abstract boolean connected(int p, int q);
+    /**
+     * Check if p and q are in the same component.
+     * @param p component
+     * @param q component
+     * @return Is there a path connecting p and q?
+     */
+    public abstract boolean connected(final int p, final int q);
 
-    public abstract void union(int p, int q);
+    /**
+     * Connects to objects.
+     *
+     * @param p object in different component
+     * @param q object to connect to
+     */
+    public abstract void union(final int p, final int q);
+
+    /**
+     * @return number of components
+     */
+    public int count() {
+        return n;
+    }
 }

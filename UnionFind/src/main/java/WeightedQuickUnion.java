@@ -1,12 +1,12 @@
 /**
  * Weighted quick union avoids having tall trees
- * by keeping track of the size of each one
+ * by keeping track of the size of each tree.
  */
 public class WeightedQuickUnion extends QuickUnion {
 
     private int[] sz;
 
-    public WeightedQuickUnion(int n) {
+    public WeightedQuickUnion(final int n) {
         super(n);
         sz = new int[n];
         for (int i = 0; i < n; i++) {
@@ -15,12 +15,9 @@ public class WeightedQuickUnion extends QuickUnion {
     }
 
     @Override
-    public void union(int p, int q) {
+    public void union(final int p, final int q) {
         int i = root(p);
         int j = root(q);
-        if (i == j) {
-            return;
-        }
         if (sz[i] < sz[j]) {
             id[i] = j;
             sz[j] += sz[i];

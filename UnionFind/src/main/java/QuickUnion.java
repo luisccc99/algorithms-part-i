@@ -1,10 +1,11 @@
-/** Quick Union is too expensive
+/**
+ * Quick Union is too expensive
+ *
  * Trees can get too tall,
- * TODO: finish descriptions
  */
 public class QuickUnion extends UnionFind {
 
-    public QuickUnion(int n) {
+    public QuickUnion(final int n) {
         super(n);
     }
 
@@ -27,12 +28,12 @@ public class QuickUnion extends UnionFind {
      * @return if p and q are have the same root
      */
     @Override
-    public boolean connected(int p, int q) {
+    public boolean connected(final int p, final int q) {
         return root(p) == root(q);
     }
 
     @Override
-    public void union(int p, int q) {
+    public void union(final int p, final int q) {
         int i = root(p);
         int j = root(q);
         id[i] = j;
