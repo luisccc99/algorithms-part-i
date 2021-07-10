@@ -37,10 +37,4 @@ public abstract class UnionFind {
      */
     public abstract void union(final int p, final int q);
 
-    /**
-     * @return number of components
-     */
-    public int count() {
-        return n;
-    }
 }
