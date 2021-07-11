@@ -2,14 +2,15 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public final class Percolation {
 
+    private static final int OFFSET = 2;
+    private final int topSite;
+    private final int bottomSite;
     private final boolean[][] grid;
-    private int numberOfOpenSites;
     private final int n;
     private final int size;
-    private final static int OFFSET = 2;
     private final WeightedQuickUnionUF unionFind;
-    private final int TOP_SITE;
-    private final int BOTTOM_SITE;
+    private int numberOfOpenSites;
+
 
     /**
      * creates n-by-n grid, with all sites initially blocked
@@ -22,8 +23,8 @@ public final class Percolation {
         }
         this.n = n;
         size = n * n;
-        TOP_SITE = size;
-        BOTTOM_SITE = size + 1;
+        topSite = size;
+        bottomSite = size + 1;
         grid = new boolean[n][n];
         unionFind = new WeightedQuickUnionUF(size + 2);
 
@@ -33,11 +34,11 @@ public final class Percolation {
                 int p;
                 if (i == 0) {
                     p = xyTo1D(i, j);
-                    unionFind.union(TOP_SITE, p);
+                    unionFind.union(topSite, p);
                 }
                 if (i == 1) {
                     p = xyTo1D(n - 1, j);
-                    unionFind.union(BOTTOM_SITE, p);
+                    unionFind.union(bottomSite, p);
                 }
             }
         }
@@ -54,12 +55,11 @@ public final class Percolation {
         if (isOpen(row, col)) {
             return;
         }
-
         grid[row - 1][col - 1] = true;
         numberOfOpenSites++;
         int p = xyTo1D(row - 1, col - 1);
         // check if there are open neighbors to connect to
-        for (int i = row - OFFSET; i <= row; i++) {
+        for (int i = row  - OFFSET; i <= row; i++) {
             for (int j = col - OFFSET; j <= col; j++) {
                 boolean corner = isCorner(i, j, row - 1, col - 1);
                 boolean isCenter = i == row - 1 && j == col - 1;
@@ -82,12 +82,17 @@ public final class Percolation {
                 || i == row - 1 && j == col - 1;
     }
 
+    /**
+     * maps 2D coordinates to 1D
+     * @param row
+     * @param col
+     * @return 1D index
+     */
     private int xyTo1D(int row, int col) {
         return row * n + col;
     }
 
     /**
-     *
      * @param row
      * @param col
      * @return is the site (row, col) open?
@@ -98,15 +103,17 @@ public final class Percolation {
     }
 
     /**
-     *
      * @param row
      * @param col
      * @return is the site (row, col) full?
      */
     public boolean isFull(int row, int col) {
         validate(row, col);
-        int p = xyTo1D(row, col);
-        return unionFind.find(p) == unionFind.find(TOP_SITE);
+        if (!isOpen(row, col)) {
+            return false;
+        }
+        int p = xyTo1D(row - 1, col - 1);
+        return unionFind.find(p) == unionFind.find(topSite);
     }
 
     public int numberOfOpenSites() {
@@ -114,7 +121,7 @@ public final class Percolation {
     }
 
     public boolean percolates() {
-        return unionFind.find(TOP_SITE) == unionFind.find(BOTTOM_SITE);
+        return unionFind.find(topSite) == unionFind.find(bottomSite);
     }
 
     private void validate(int row, int col) {
