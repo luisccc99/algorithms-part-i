@@ -1,23 +1,24 @@
+import edu.princeton.cs.algs4.StdOut;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-// TODO: add message in exceptions
 /**
  * A double-ended queue or deque (pronounced “deck”) is a generalization
  * of a stack and a queue that supports adding and removing items from either
  * the front or the back of the data structure.
- * @param <T> type of the elements in the Deque
+ * @param <Item> type of the elements in the Deque
  */
-public class Deque<T> implements Iterable<T> {
+public class Deque<Item> implements Iterable<Item> {
     private int n;
     private Node first;
     private Node last;
 
     private class Node {
-        T element;
+        Item element;
         Node prev;
         Node next;
 
-        public Node(T element, Node prev, Node next) {
+        public Node(Item element, Node prev, Node next) {
             this.element = element;
             this.prev = prev;
             this.next = next;
@@ -38,7 +39,7 @@ public class Deque<T> implements Iterable<T> {
         return n;
     }
 
-    public void addFirst(T element) {
+    public void addFirst(Item element) {
         if (element == null) {
             throw new IllegalArgumentException();
         }
@@ -53,7 +54,7 @@ public class Deque<T> implements Iterable<T> {
         n++;
     }
 
-    public void addLast(T element) {
+    public void addLast(Item element) {
         if (element == null) {
             throw new IllegalArgumentException();
         }
@@ -68,32 +69,32 @@ public class Deque<T> implements Iterable<T> {
         n++;
     }
 
-    public T removeFirst() {
+    public Item removeFirst() {
         if (isEmpty()) {
             throw new NoSuchElementException("Stack underflow");
         }
-        T element = first.element;
+        Item element = first.element;
         first = first.next;
         n--;
         return element;
     }
 
-    public T removeLast() {
+    public Item removeLast() {
         if (isEmpty()) {
             throw new NoSuchElementException("Stack underflow");
         }
-        T element = last.element;
+        Item element = last.element;
         last = last.prev;
         n--;
         return element;
     }
 
     @Override
-    public Iterator<T> iterator() {
+    public Iterator<Item> iterator() {
         return new LinearIterator();
     }
 
-    private class LinearIterator implements Iterator<T> {
+    private class LinearIterator implements Iterator<Item> {
         Node current = first;
 
         @Override
@@ -102,11 +103,11 @@ public class Deque<T> implements Iterable<T> {
         }
 
         @Override
-        public T next() {
+        public Item next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            T element = current.element;
+            Item element = current.element;
 
             current = current.next;
             return element;
@@ -120,16 +121,14 @@ public class Deque<T> implements Iterable<T> {
 
     public static void main(String[] args) {
         Deque<Integer> deque = new Deque<>();
-        System.out.println("adding at the beginning");
         // 0 1 2 3 4
         for (int i = 0; i < 5; i++) {
-            System.out.print(i + " ");
+            StdOut.print(i + " ");
             deque.addFirst(i);
         }
-        System.out.println();
-        System.out.println("looping through deque");
+        StdOut.println();
         for (int n : deque) {
-            System.out.print(n + " ");
+            StdOut.print(n + " ");
         }
         // 4 3 2 1 0
     }
