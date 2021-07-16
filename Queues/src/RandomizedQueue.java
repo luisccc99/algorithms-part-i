@@ -4,7 +4,6 @@ import edu.princeton.cs.algs4.StdRandom;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 /**
  * A randomized queue is similar to a stack or queue, except that the
@@ -15,12 +14,13 @@ public class RandomizedQueue<E> implements Iterable<E> {
     private static final int INITIAL_CAPACITY = 8;
     private E[] items;
     private int n;
-    private int head;
     private int tail;
 
-    @SuppressWarnings("unchecked casts")
+    @SuppressWarnings("unchecked casts") // ugly cast
     public RandomizedQueue() {
         items = (E[]) new Object[INITIAL_CAPACITY];
+        n = 0;
+        tail = 0;
     }
 
     public boolean isEmpty() {
@@ -35,16 +35,26 @@ public class RandomizedQueue<E> implements Iterable<E> {
         if (element == null) {
             throw new IllegalArgumentException();
         }
-
+        if (n == items.length) {
+            resize(items.length * 2);
+        }
+        items[tail++] = element;
         n++;
     }
 
     public E dequeue() {
         if (isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Queue underflow");
         }
+        if (n <= (items.length / 4)) {
+            resize(items.length / 2);
+        }
+        int index = StdRandom.uniform(n);
+        E element = items[index];
+        items[index] = items[--tail];
+        items[tail] = null;
         n--;
-        return null;
+        return element;
     }
 
     private void resize(int capacity) {
@@ -53,9 +63,9 @@ public class RandomizedQueue<E> implements Iterable<E> {
 
     public E sample() {
         if (isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Queue underflow");
         }
-        return null;
+        return items[StdRandom.uniform(n)];
     }
 
     @Override
@@ -64,15 +74,25 @@ public class RandomizedQueue<E> implements Iterable<E> {
     }
 
     private class RandomIterator implements Iterator<E> {
+        E[] cp;
+        int current = 0;
+
+        public RandomIterator() {
+            cp = Arrays.copyOf(items, n);
+            StdRandom.shuffle(cp);
+        }
 
         @Override
         public boolean hasNext() {
-            return false;
+            return current < n;
         }
 
         @Override
         public E next() {
-            return null;
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return cp[current++];
         }
 
         @Override

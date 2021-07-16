@@ -70,7 +70,7 @@ public class Deque<T> implements Iterable<T> {
 
     public T removeFirst() {
         if (isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Stack underflow");
         }
         T element = first.element;
         first = first.next;
@@ -80,7 +80,7 @@ public class Deque<T> implements Iterable<T> {
 
     public T removeLast() {
         if (isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Stack underflow");
         }
         T element = last.element;
         last = last.prev;
@@ -121,6 +121,7 @@ public class Deque<T> implements Iterable<T> {
     public static void main(String[] args) {
         Deque<Integer> deque = new Deque<>();
         System.out.println("adding at the beginning");
+        // 0 1 2 3 4
         for (int i = 0; i < 5; i++) {
             System.out.print(i + " ");
             deque.addFirst(i);
@@ -130,5 +131,6 @@ public class Deque<T> implements Iterable<T> {
         for (int n : deque) {
             System.out.print(n + " ");
         }
+        // 4 3 2 1 0
     }
 }
