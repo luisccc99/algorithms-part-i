@@ -73,20 +73,30 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException("Stack underflow");
         }
-        Item element = first.element;
-        first = first.next;
-        n--;
-        return element;
+        return remove(first);
     }
 
     public Item removeLast() {
         if (isEmpty()) {
             throw new NoSuchElementException("Stack underflow");
         }
-        Item element = last.element;
-        last = last.prev;
+        return remove(last);
+    }
+
+    private Item remove(Node node) {
+        Item item = node.element;
+        if (last == first){
+            last = null;
+            first = null;
+        } else if (node.prev == null) { // first
+            first = first.next;
+            first.prev = null;
+        } else if (node.next == null) { // last
+            last = last.prev;
+            last.next = null;
+        }
         n--;
-        return element;
+        return item;
     }
 
     @Override
@@ -121,15 +131,11 @@ public class Deque<Item> implements Iterable<Item> {
 
     public static void main(String[] args) {
         Deque<Integer> deque = new Deque<>();
-        // 0 1 2 3 4
-        for (int i = 0; i < 5; i++) {
-            StdOut.print(i + " ");
-            deque.addFirst(i);
-        }
-        StdOut.println();
-        for (int n : deque) {
-            StdOut.print(n + " ");
-        }
-        // 4 3 2 1 0
+        deque.addLast(2);
+        deque.addLast(4);
+        deque.addLast(5);
+        System.out.println(deque.removeFirst());
+        System.out.println(deque.removeFirst());
+        System.out.println(deque.removeFirst());
     }
 }

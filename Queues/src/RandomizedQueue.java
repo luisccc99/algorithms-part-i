@@ -15,7 +15,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     private int n;
     private int tail;
 
-    @SuppressWarnings("unchecked casts") // ugly cast
     public RandomizedQueue() {
         items = (Item[]) new Object[INITIAL_CAPACITY];
         n = 0;
@@ -56,10 +55,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         return element;
     }
 
-    @SuppressWarnings("unchecked casts")
     private void resize(int capacity) {
         Item[] cp = (Item[]) new Object[capacity];
-        for (int i = 0; i < capacity; i++) {
+        for (int i = 0; i < n; i++) {
             cp[i] = items[i];
         }
         items = cp;
@@ -81,7 +79,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         Item[] cp;
         int current = 0;
 
-        @SuppressWarnings("unchecked")
         public RandomIterator() {
             cp = (Item[]) new Object[n];
             for (int i = 0; i < n; i++) {
@@ -111,12 +108,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public static void main(String[] args) {
         RandomizedQueue<Integer> queue = new RandomizedQueue<>();
-        for (int i = 0; i < 5; i++)
-            queue.enqueue(i);
-        for (int a : queue) {
-            for (int b : queue)
-                StdOut.print(a + "-" + b + " ");
-            StdOut.println();
-        }
+        queue.enqueue(2);
+        queue.enqueue(3);
+        System.out.println(queue.isEmpty());
+        System.out.println(queue.dequeue());
     }
 }
