@@ -2,10 +2,27 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.Arrays;
+
 public class FastCollinearPoints {
 
     public FastCollinearPoints(Point[] points) {
+        validate(points);
+        for (Point point : points) {
+            Arrays.sort(points, point.slopeOrder());
+            // TODO: check if 3 or more points have the same scope
+        }
+    }
 
+    private void validate(Point[] points) {
+        if (points == null) {
+            throw new IllegalArgumentException();
+        }
+        for (Point point : points) {
+            if (point == null) {
+                throw new IllegalArgumentException();
+            }
+        }
     }
 
     public int numberOfSegments() {

@@ -32,7 +32,6 @@ public class Point implements Comparable<Point> {
      * Draws this point to standard draw.
      */
     public void draw() {
-        /* DO NOT MODIFY */
         StdDraw.point(x, y);
     }
 
@@ -43,7 +42,6 @@ public class Point implements Comparable<Point> {
      * @param that the other point
      */
     public void drawTo(Point that) {
-        /* DO NOT MODIFY */
         StdDraw.line(this.x, this.y, that.x, that.y);
     }
 
@@ -142,6 +140,11 @@ public class Point implements Comparable<Point> {
      * Unit tests the Point data type.
      */
     public static void main(String[] args) {
-        /* YOUR CODE HERE */
+        Point A = new Point(4, 4);
+        Point B = new Point(7, 5);
+        Point C = new Point(5, 6);
+        System.out.println("A=" + A + ", B=" + B + ", C=" + C);
+        System.out.println("A slope to B =" + A.slopeTo(B) + "\nA slope to C =" + A.slopeTo(C));
+        System.out.println(A.slopeOrder().compare(B, C));
     }
 }
