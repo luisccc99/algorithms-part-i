@@ -8,30 +8,33 @@ import java.util.List;
 
 public class FastCollinearPoints {
 
-    private int numberOfSegments;
     private List<LineSegment> lineSegments;
 
     public FastCollinearPoints(Point[] points) {
-        validate(points);
+        validateNullPoints(points);
+        Point[] copy = copyOf(points);
+        validateRepeatedPoints(copy);
         lineSegments = new ArrayList<>();
-        Point[] cp = copyOf(points);
         for (Point origin : points) {
-            Arrays.sort(cp, origin.slopeOrder());
-            for (int j = 1; j < cp.length - 1; j++) {
-                Point p = cp[j - 1];
-                Point q = cp[j];
-                Point r = cp[j + 1];
-                if (origin.equals(p) || origin.equals(q) || origin.equals(r)) {
+            Arrays.sort(copy, origin.slopeOrder());
+            Point[] segmentPoints;
+            for (int j = 1; j < copy.length - 1; j++) {
+                Point p = copy[j - 1];
+                Point q = copy[j];
+                Point r = copy[j + 1];
+                double originSlopeToP = origin.slopeTo(p);
+                double originSlopeToQ = origin.slopeTo(q);
+                double originSlopeToR = origin.slopeTo(r);
+                if (originSlopeToP == 0 || originSlopeToQ == 0
+                        || originSlopeToR == 0) {
                     continue;
                 }
-                Point[] segment;
-                if (origin.slopeTo(p) == origin.slopeTo(q) &&
-                        origin.slopeTo(q) == origin.slopeTo(r)) {
-                    segment = new Point[]{origin, p, q, r};
-                    Arrays.sort(segment);
-                    if (origin.equals(segment[points.length - 1])) {
-                        lineSegments.add(new LineSegment(points[0], origin));
-                        numberOfSegments++;
+                if (originSlopeToP == originSlopeToQ
+                        && originSlopeToP == originSlopeToR) {
+                    segmentPoints = new Point[]{p, q, r, origin};
+                    Arrays.sort(segmentPoints);
+                    if (origin == segmentPoints[segmentPoints.length - 1]) {
+                        lineSegments.add(new LineSegment(segmentPoints[0], origin));
                     }
                 }
             }
@@ -46,23 +49,29 @@ public class FastCollinearPoints {
         return cp;
     }
 
-    private void validate(Point[] points) {
+    private void validateNullPoints(Point[] points) {
         if (points == null) {
             throw new IllegalArgumentException();
         }
+    }
+
+    private void validateRepeatedPoints(Point[] points) {
+        Arrays.sort(points);
         for (int i = 1; i < points.length; i++) {
-            if (points[i - 1] == null || points[i - 1].equals(points[i])) {
+            Point p = points[i - 1];
+            Point q = points[i];
+            if (p.compareTo(q) == 0) {
                 throw new IllegalArgumentException();
             }
         }
     }
 
     public int numberOfSegments() {
-        return numberOfSegments;
+        return lineSegments.size();
     }
 
     public LineSegment[] segments() {
-        return lineSegments.toArray(new LineSegment[numberOfSegments]);
+        return lineSegments.toArray(new LineSegment[0]);
     }
 
     public static void main(String[] args) {
@@ -94,3 +103,4 @@ public class FastCollinearPoints {
         StdDraw.show();
     }
 }
+
