@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+// TODO: Describe solution in constructor
 public class BruteCollinearPoints {
 
     private final List<LineSegment> segments;

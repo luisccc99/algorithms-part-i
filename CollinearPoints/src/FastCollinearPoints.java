@@ -5,7 +5,7 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+// TODO: Describe solution in constructor
 public class FastCollinearPoints {
 
     private List<LineSegment> lineSegments;
