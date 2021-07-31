@@ -20,7 +20,7 @@ public class Solver {
         if (!isSolvable()) {
             return -1;
         }
-
+        return 0;
     }
 
     // sequence of boards in a shortest solution; null if unsolvable
