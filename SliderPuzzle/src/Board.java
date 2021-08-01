@@ -1,8 +1,10 @@
+import java.util.Arrays;
 
 public final class Board {
 
     public final int[][] tiles;
     private final int n;
+
     /*
      * create a board from an n-by-n array of tiles,
      * where tiles[row][col] = tile at (row, col)
@@ -21,9 +23,10 @@ public final class Board {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
+        builder.append(n).append('\n');
         for (int[] row : tiles) {
             for (int n : row) {
-                builder.append(n).append(' ');
+                builder.append(String.format("%2d", n));
             }
             builder.append('\n');
         }
@@ -37,7 +40,7 @@ public final class Board {
 
     // number of tiles out of place
     public int hamming() {
-        int outOfPlace = 0;
+        int total = 0;
         int index = 1;
         for (int row = 0; row < n; row++) {
             for (int col = 0; col < n; col++) {
@@ -46,21 +49,53 @@ public final class Board {
                     index++;
                     continue;
                 }
-                outOfPlace += n != index ? 1 : 0;
+                total += n != index ? 1 : 0;
                 index++;
             }
         }
-        return outOfPlace;
+        return total;
     }
 
     // sum of Manhattan distances between tiles and goal
     public int manhattan() {
-        return 0;
+        int total = 0;
+        int index = 1;
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                int n = tiles[row][col];
+                if (n == 0) {
+                    index++;
+                    continue;
+                }
+                if (n != index) {
+                    int diff = Math.abs(n - index);
+                    if (diff > 2) {
+                        diff /= 2;
+                    }
+                    total += diff;
+                }
+                index++;
+            }
+        }
+        return total;
     }
 
     // is this board the goal board?
     public boolean isGoal() {
-        return false;
+        int index = 1;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (tiles[i][j] == 0) {
+                    index++;
+                    continue;
+                }
+                if (tiles[i][j] != index) {
+                    return false;
+                }
+                index++;
+            }
+        }
+        return true;
     }
 
     // does this board equal y?
@@ -75,18 +110,10 @@ public final class Board {
         if (this.getClass() != y.getClass()) {
             return false;
         }
-
         if (dimension() != ((Board) y).dimension()) {
             return false;
         }
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++ ) {
-                if (this.tiles[i][j] != ((Board) y).tiles[i][j]) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return Arrays.deepEquals(this.tiles, ((Board) y).tiles);
     }
 
     @Override
@@ -105,13 +132,14 @@ public final class Board {
     }
 
     public static void main(String[] args) {
-        int[][] sample = new int[][] {
-                {5, 1, 2},
-                {0, 4, 3},
-                {8, 7, 6}
+        int[][] sample = new int[][]{
+                {4, 1, 3},
+                {0, 2, 5},
+                {7, 8, 6}
         };
         Board b = new Board(sample);
         System.out.println("hamming: " + b.hamming());
+        System.out.println("manhattan: " + b.manhattan());
         System.out.println(b);
     }
 
