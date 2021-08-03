@@ -2,6 +2,7 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
 public class Solver {
+    private Board initial;
 
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
@@ -32,7 +33,6 @@ public class Solver {
     }
 
     public static void main(String[] args) {
-
         // create initial board from file
         In in = new In(args[0]);
         int n = in.readInt();
