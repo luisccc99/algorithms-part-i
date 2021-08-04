@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public final class Board {
 
-    public final int[][] tiles;
+    private final int[][] tiles;
     private final int n;
     private int blankRow;
     private int blankCol;
