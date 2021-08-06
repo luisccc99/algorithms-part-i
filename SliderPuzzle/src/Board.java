@@ -1,6 +1,5 @@
 import edu.princeton.cs.algs4.Queue;
 import java.util.Arrays;
-import java.util.Objects;
 
 public final class Board {
 
@@ -68,19 +67,17 @@ public final class Board {
     public int manhattan() {
         int total = 0;
         int index = 1;
-        for (int row = 0; row < n; row++) {
-            for (int col = 0; col < n; col++) {
-                int n = tiles[row][col];
-                if (n == 0) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                int tile = tiles[i][j];
+                if (tile == 0) {
                     index++;
                     continue;
                 }
-                if (n != index) {
-                    int diff = Math.abs(n - index);
-                    if (diff > 2) {
-                        diff /= 2;
-                    }
-                    total += diff;
+                if (tile != index) {
+                    int col = (tile - 1) % n;
+                    int row = (tile - 1) / n;
+                    total += Math.abs(i - row) + Math.abs(j - col);
                 }
                 index++;
             }
@@ -122,13 +119,6 @@ public final class Board {
             return false;
         }
         return Arrays.deepEquals(this.tiles, ((Board) y).tiles);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(n);
-        result = 31 * result + Arrays.deepHashCode(tiles);
-        return result;
     }
 
     // all neighboring boards

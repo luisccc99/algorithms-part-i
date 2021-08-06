@@ -1,14 +1,15 @@
-import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.Stack;
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
-import java.util.Comparator;
-
 public class Solver {
-    private boolean isSolvable;
+    private boolean isTwinSolvable;
+    private Stack<Board> path;
+    private int moves;
 
-    private class SearchNode {
-        int hamming;
+    private class SearchNode implements Comparable<SearchNode> {
+        int manhattan;
         int moves;
         Board board;
         SearchNode prev;
@@ -16,14 +17,19 @@ public class Solver {
         public SearchNode(Board board, SearchNode prev,
                           int hamming, int moves) {
             this.board = board;
-            this.hamming = hamming;
+            this.manhattan = hamming;
             this.moves = moves;
             this.prev = prev;
         }
 
         // hamming priority
-        public int hamming() {
-            return moves + hamming;
+        public int manhattan() {
+            return moves + manhattan;
+        }
+
+        @Override
+        public int compareTo(SearchNode o) {
+            return this.manhattan() - o.manhattan();
         }
     }
 
@@ -33,48 +39,64 @@ public class Solver {
             throw new IllegalArgumentException();
         }
         Board twin = initial.twin();
-        MinPQ<SearchNode> originalTree = new MinPQ<>(initial.hamming(),
-                Comparator.comparingInt(SearchNode::hamming));
+        MinPQ<SearchNode> originalTree = new MinPQ<>(initial.hamming());
 
-        MinPQ<SearchNode> twinTree = new MinPQ<>(twin.manhattan(),
-                Comparator.comparingInt(SearchNode::hamming));
+        MinPQ<SearchNode> twinTree = new MinPQ<>(twin.manhattan());
 
         SearchNode current = new SearchNode(
-                initial, null, initial.hamming(), 0
+                initial,
+                null,
+                initial.manhattan(),
+                0
         );
 
         SearchNode currentTwin = new SearchNode(
-                twin, null, twin.hamming(), 0
+                twin,
+                null,
+                twin.manhattan(),
+                0
         );
 
-        originalTree.insert(current);
-        twinTree.insert(currentTwin);
-
-        while (!isSolvable) {
-            for (Board neighbor : current.board.neighbors()) {
-                if (neighbor.equals(current.board)) {
-                    continue;
-                }
-                System.out.println("adding" + "\n" + neighbor);
-                SearchNode node = new SearchNode(
-                        neighbor
-                        , current
-                        , neighbor.hamming()
-                        , current.moves + 1
-                );
-                originalTree.insert(node);
+        while (!isTwinSolvable) {
+            if (currentTwin.board.isGoal()) {
+                isTwinSolvable = true;
+                break;
             }
-            current = originalTree.delMin();
             if (current.board.isGoal()) {
-                isSolvable = true;
-                System.out.println("solved");
+                path = new Stack<>();
+                moves = current.moves;
+                for (SearchNode x = current; x != null; x = x.prev) {
+                    path.push(x.board);
+                }
+                isTwinSolvable = false;
+                break;
             }
+            current = getNeighborWithMinPriority(current, originalTree);
+            currentTwin = getNeighborWithMinPriority(currentTwin, twinTree);
+
         }
+    }
+
+    private SearchNode getNeighborWithMinPriority(SearchNode current,
+                                            MinPQ<SearchNode> tree) {
+        for (Board neighbor : current.board.neighbors()) {
+            if (neighbor.equals(current.board)) {
+                continue;
+            }
+            SearchNode node = new SearchNode(
+                    neighbor,
+                    current,
+                    neighbor.hamming(),
+                    current.moves + 1
+            );
+            tree.insert(node);
+        }
+        return tree.delMin();
     }
 
     // is the initial board solvable?
     public boolean isSolvable() {
-        return isSolvable;
+        return !isTwinSolvable;
     }
 
     // min number of moves to solve initial board; -1 if unsolvable
@@ -82,7 +104,7 @@ public class Solver {
         if (!isSolvable()) {
             return -1;
         }
-        return 0;
+        return moves;
     }
 
     // sequence of boards in a shortest solution; null if unsolvable
@@ -90,22 +112,17 @@ public class Solver {
         if (!isSolvable()) {
             return null;
         }
-        return () -> null;
+        return path;
     }
 
     public static void main(String[] args) {
         // create initial board from file
-        /*In in = new In(args[0]);
+        In in = new In(args[0]);
         int n = in.readInt();
         int[][] tiles = new int[n][n];
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
-                tiles[i][j] = in.readInt();*/
-        int[][] tiles = new int[][]{
-                {0, 1, 3},
-                {4, 2, 5},
-                {7, 8, 6}
-        };
+                tiles[i][j] = in.readInt();
         Board initial = new Board(tiles);
 
         // solve the puzzle
