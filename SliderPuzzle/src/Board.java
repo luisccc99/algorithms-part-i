@@ -33,7 +33,7 @@ public final class Board {
         builder.append(n).append('\n');
         for (int[] row : tiles) {
             for (int n : row) {
-                builder.append(String.format("%2d", n));
+                builder.append(String.format("%2d ", n));
             }
             builder.append('\n');
         }

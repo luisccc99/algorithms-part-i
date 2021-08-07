@@ -15,14 +15,14 @@ public class Solver {
         SearchNode prev;
 
         public SearchNode(Board board, SearchNode prev,
-                          int hamming, int moves) {
+                          int manhattan, int moves) {
             this.board = board;
-            this.manhattan = hamming;
+            this.manhattan = manhattan;
             this.moves = moves;
             this.prev = prev;
         }
 
-        // hamming priority
+        // manhattan priority
         public int manhattan() {
             return moves + manhattan;
         }
@@ -39,7 +39,7 @@ public class Solver {
             throw new IllegalArgumentException();
         }
         Board twin = initial.twin();
-        MinPQ<SearchNode> originalTree = new MinPQ<>(initial.hamming());
+        MinPQ<SearchNode> originalTree = new MinPQ<>(initial.manhattan());
 
         MinPQ<SearchNode> twinTree = new MinPQ<>(twin.manhattan());
 
@@ -56,12 +56,15 @@ public class Solver {
                 twin.manhattan(),
                 0
         );
+        originalTree.insert(current);
+        twinTree.insert(currentTwin);
 
         while (!isTwinSolvable) {
             if (currentTwin.board.isGoal()) {
                 isTwinSolvable = true;
                 break;
             }
+
             if (current.board.isGoal()) {
                 path = new Stack<>();
                 moves = current.moves;
@@ -73,20 +76,19 @@ public class Solver {
             }
             current = getNeighborWithMinPriority(current, originalTree);
             currentTwin = getNeighborWithMinPriority(currentTwin, twinTree);
-
         }
     }
 
     private SearchNode getNeighborWithMinPriority(SearchNode current,
                                             MinPQ<SearchNode> tree) {
         for (Board neighbor : current.board.neighbors()) {
-            if (neighbor.equals(current.board)) {
+            if (current.prev != null && neighbor.equals(current.prev.board)) {
                 continue;
             }
             SearchNode node = new SearchNode(
                     neighbor,
                     current,
-                    neighbor.hamming(),
+                    neighbor.manhattan(),
                     current.moves + 1
             );
             tree.insert(node);
