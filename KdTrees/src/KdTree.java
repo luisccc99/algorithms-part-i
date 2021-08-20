@@ -51,28 +51,55 @@ public class KdTree {
     public void insert(Point2D p) {
         validate(p);
         if (!contains(p)) {
-            root = insert(root, p, HORIZONTAL);
+            root = insert(root, p, HORIZONTAL, null);
             size++;
         }
     }
 
-    private Node insert(Node node, Point2D p, boolean orientation) {
+    private Node insert(Node node, Point2D p,
+                        boolean orientation, Point2D parent) {
         if (node == null) {
-            return new Node(p);
-        }
-        int cmp;
-        if (orientation == HORIZONTAL) {
-            cmp = Point2D.X_ORDER.compare(p, node.p);
-        } else {
-            cmp = Point2D.Y_ORDER.compare(p, node.p);
+            Node elem = new Node(p);
+            // setting rect for node
+            // if parent is null it means is node for root
+            // else determine min and max of x and y for node
+            if (parent == null) {
+                elem.rect = new RectHV(0, 0, 1, 1);
+            } else {
+                if (orientation == HORIZONTAL) {
+                    double y = p.y();
+                    if (less(p, parent, orientation)) {
+                        elem.rect = new RectHV(0, y, parent.x(), y);
+                    } else {
+                        elem.rect = new RectHV(parent.x(), y, 1, y);
+                    }
+                } else {
+                    double x = p.x();
+                    if (less(p, parent, orientation)) {
+                        elem.rect = new RectHV(x, 0, x, parent.y());
+                    } else {
+                        elem.rect = new RectHV(x, parent.y(), x, 1);
+                    }
+                }
+            }
+            return elem;
         }
 
-        if (cmp < 0) { // go left or below
-            node.lb = insert(node.lb, p, !orientation);
+        if (less(p, node.p, orientation)) { // go left or below
+            node.lb = insert(node.lb, p, !orientation, node.p);
         } else { // go right or above
-            node.rt = insert(node.rt, p, !orientation);
+            node.rt = insert(node.rt, p, !orientation, node.p);
         }
+
         return node;
+    }
+
+    private boolean less(Point2D p, Point2D q, boolean orientation) {
+        if (orientation == HORIZONTAL) {
+            return Point2D.X_ORDER.compare(p, q) < 0;
+        } else {
+            return Point2D.Y_ORDER.compare(p, q) < 0;
+        }
     }
 
     // does the set contain p?
@@ -85,16 +112,10 @@ public class KdTree {
         if (node == null) {
             return false;
         }
-        int cmp;
-        if (orientation == HORIZONTAL) {
-            cmp = Point2D.X_ORDER.compare(p, node.p);
-        } else { // vertical
-            cmp = Point2D.Y_ORDER.compare(p, node.p);
-        }
 
-        if (cmp < 0) { // go left or bottom
+        if (less(p, node.p, orientation)) { // go left or bottom
             return contains(p, node.lb, !orientation);
-        } else if (p.compareTo(node.p) == 0){
+        } else if (p.compareTo(node.p) == 0) { // search hit
             return true;
         } else { // go right or top
             return contains(p, node.rt, !orientation);
@@ -103,7 +124,7 @@ public class KdTree {
 
     // draw all points to standard draw
     public void draw() {
-
+        
     }
 
     // all points that are inside the rectangle (or on the boundary)
