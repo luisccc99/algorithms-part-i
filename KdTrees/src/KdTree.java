@@ -1,8 +1,10 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.StdDraw;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class KdTree {
 
@@ -64,21 +66,22 @@ public class KdTree {
             // if parent is null it means is node for root
             // else determine min and max of x and y for node
             if (parent == null) {
-                elem.rect = new RectHV(0, 0, 1, 1);
+                elem.rect = new RectHV(p.x(), 0, p.x(), 1);
             } else {
                 if (orientation == HORIZONTAL) {
+                    double x = p.x();
+                    if (less(p, parent, !orientation)) {
+                        elem.rect = new RectHV(x, 0, x, parent.y());
+
+                    } else {
+                        elem.rect = new RectHV(x, parent.y(), x, 1);
+                    }
+                } else {
                     double y = p.y();
-                    if (less(p, parent, orientation)) {
+                    if (less(p, parent, !orientation)) {
                         elem.rect = new RectHV(0, y, parent.x(), y);
                     } else {
                         elem.rect = new RectHV(parent.x(), y, 1, y);
-                    }
-                } else {
-                    double x = p.x();
-                    if (less(p, parent, orientation)) {
-                        elem.rect = new RectHV(x, 0, x, parent.y());
-                    } else {
-                        elem.rect = new RectHV(x, parent.y(), x, 1);
                     }
                 }
             }
@@ -124,7 +127,28 @@ public class KdTree {
 
     // draw all points to standard draw
     public void draw() {
-        
+        draw(root);
+    }
+
+    private void draw(Node node) {
+        if (node == null) {
+            return;
+        }
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(0.01);
+        node.p.draw();
+        StdDraw.setPenRadius();
+        // set colors
+        if (node.rect.ymax() == node.rect.ymin()) {
+            StdDraw.setPenColor(StdDraw.BOOK_BLUE);
+        } else {
+            StdDraw.setPenColor(StdDraw.BOOK_RED);
+        }
+        node.rect.draw();
+
+
+        draw(node.lb);
+        draw(node.rt);
     }
 
     // all points that are inside the rectangle (or on the boundary)
@@ -150,17 +174,10 @@ public class KdTree {
 
     public static void main(String[] args) {
         KdTree tree2d = new KdTree();
-        Point2D p1 = new Point2D(0.3, 0.3);
-        Point2D p2 = new Point2D(0.7, 0.2);
-        Point2D p3 = new Point2D(0.2, 0.1);
-        Point2D p4 = new Point2D(0.1, 0.1);
-        Point2D p5 = new Point2D(0.5, 0.2);
-        tree2d.insert(p1);
-        tree2d.insert(p2);
-        tree2d.insert(p3);
-        tree2d.insert(p4);
-        System.out.println(tree2d.contains(p1));
-        System.out.println(tree2d.contains(p4));
-        System.out.println(tree2d.contains(p5));
+        Random r = new Random();
+        for (int i = 0; i < 20; i++) {
+            tree2d.insert(new Point2D(r.nextDouble(), r.nextDouble()));
+        }
+        tree2d.draw();
     }
 }
