@@ -2,6 +2,7 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -58,43 +59,45 @@ public class KdTree {
         }
     }
 
-    private Node insert(Node node, Point2D p,
-                        boolean orientation, Point2D parent) {
-        if (node == null) {
-            Node elem = new Node(p);
+    private Node insert(Node current, Point2D p,
+                        boolean orientation, Node parent) {
+        if (current == null) {
+            Node node = new Node(p);
             // setting rect for node
             // if parent is null it means is node for root
             // else determine min and max of x and y for node
             if (parent == null) {
-                elem.rect = new RectHV(p.x(), 0, p.x(), 1);
+                node.rect = new RectHV(0, 0, 1, 1);
             } else {
+                Point2D q = parent.p;
+                RectHV rectHV = parent.rect;
                 if (orientation == HORIZONTAL) {
-                    double x = p.x();
-                    if (less(p, parent, !orientation)) {
-                        elem.rect = new RectHV(x, 0, x, parent.y());
-
+                    if (less(p, q, !orientation)) {
+                        node.rect = new RectHV(rectHV.xmin(), rectHV.ymin(),
+                                rectHV.xmax(), q.y());
                     } else {
-                        elem.rect = new RectHV(x, parent.y(), x, 1);
+                        node.rect = new RectHV(rectHV.xmin(), q.y(),
+                                rectHV.xmax(), rectHV.ymax());
                     }
                 } else {
-                    double y = p.y();
-                    if (less(p, parent, !orientation)) {
-                        elem.rect = new RectHV(0, y, parent.x(), y);
+                    if (less(p, q, !orientation)) {
+                        node.rect = new RectHV(rectHV.xmin(), rectHV.ymin(),
+                                q.x(), rectHV.ymax());
                     } else {
-                        elem.rect = new RectHV(parent.x(), y, 1, y);
+                        node.rect = new RectHV(q.x(), rectHV.ymin(),
+                                rectHV.xmax(), rectHV.ymax());
                     }
                 }
             }
-            return elem;
+            return node;
         }
 
-        if (less(p, node.p, orientation)) { // go left or below
-            node.lb = insert(node.lb, p, !orientation, node.p);
+        if (less(p, current.p, orientation)) { // go left or below
+            current.lb = insert(current.lb, p, !orientation, current);
         } else { // go right or above
-            node.rt = insert(node.rt, p, !orientation, node.p);
+            current.rt = insert(current.rt, p, !orientation, current);
         }
-
-        return node;
+        return current;
     }
 
     private boolean less(Point2D p, Point2D q, boolean orientation) {
@@ -127,10 +130,10 @@ public class KdTree {
 
     // draw all points to standard draw
     public void draw() {
-        draw(root);
+        draw(root, HORIZONTAL);
     }
 
-    private void draw(Node node) {
+    private void draw(Node node, boolean orientation) {
         if (node == null) {
             return;
         }
@@ -138,31 +141,62 @@ public class KdTree {
         StdDraw.setPenRadius(0.01);
         node.p.draw();
         StdDraw.setPenRadius();
-        // set colors
-        if (node.rect.ymax() == node.rect.ymin()) {
-            StdDraw.setPenColor(StdDraw.BOOK_BLUE);
-        } else {
+        if (orientation == HORIZONTAL) {
             StdDraw.setPenColor(StdDraw.BOOK_RED);
+            StdDraw.line(node.p.x(), node.rect.ymin(),
+                    node.p.x(), node.rect.ymax());
+        } else {
+            StdDraw.setPenColor(StdDraw.BOOK_BLUE);
+            StdDraw.line(node.rect.xmin(), node.p.y(),
+                    node.rect.xmax(), node.p.y());
         }
-        node.rect.draw();
-
-
-        draw(node.lb);
-        draw(node.rt);
+        draw(node.lb, !orientation);
+        draw(node.rt, !orientation);
     }
 
     // all points that are inside the rectangle (or on the boundary)
     public Iterable<Point2D> range(RectHV rect) {
         validate(rect);
-        List<Point2D> point2DList = new ArrayList<>();
-        // traverse 2d tree
-        return point2DList;
+        List<Point2D> pointsInRange = new ArrayList<>();
+        range(rect, root, pointsInRange);
+        return pointsInRange;
+    }
+
+    private void range(RectHV queryRect, Node node, List<Point2D> pointsInRange) {
+        if (node == null) {
+            return;
+        }
+        if (queryRect.contains(node.p)) {
+            pointsInRange.add(node.p);
+        }
+        if (queryRect.intersects(node.lb.rect)
+                && queryRect.intersects(node.rt.rect)) {
+            range(queryRect, node.lb, pointsInRange);
+            range(queryRect, node.rt, pointsInRange);
+        } else if (queryRect.intersects(node.lb.rect)) {
+            range(queryRect, node.lb, pointsInRange);
+        } else {
+            range(queryRect, node.rt, pointsInRange);
+        }
     }
 
     // a nearest neighbor in the set to point p; null if the set is empty
     public Point2D nearest(Point2D p) {
         validate(p);
-        // traverse 2d tree
+        return nearest(root, p, null, root.p);
+    }
+
+    private Point2D nearest(Node node, Point2D queryPoint,
+                            RectHV rect, Point2D champ) {
+        if (node == null) {
+            return champ;
+        }
+
+        if (node.lb.rect.contains(queryPoint)) {
+            // go left-bottom
+        } else {
+            // go right-top
+        }
         return null;
     }
 
