@@ -1,25 +1,28 @@
+
 import edu.princeton.cs.algs4.Point2D;
-import edu.princeton.cs.algs4.RandomSeq;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 
-import java.util.Random;
+import java.awt.*;
 
 public class Test {
 
     public static void main(String[] args) {
-        RectHV query = new RectHV(.2, .2, .3, .5);
-        RectHV right = new RectHV(.5, .1, .9, .9);
-        RectHV left = new RectHV(.1, .1, .5, .9);
-        RectHV root = new RectHV(0, 0, 1, 1);
-        query.draw();
-        right.draw();
-        left.draw();
-        System.out.println(query.intersects(left));
-        System.out.println(left.intersects(query));
-        System.out.println(query.intersects(right));
-        System.out.println(right.intersects(query));
-        System.out.println(query.intersects(root));
-        System.out.println(root.intersects(query));
+        RectHV rect = new RectHV(0.05, 0.05, 0.4, 0.4);
+        Point2D first = new Point2D(0, 0);
+        Point2D second = new Point2D(0.1, 0);
+        Point2D third = new Point2D(0, 0.1);
+        Point2D fourth = new Point2D(0.2, 0);
+        rect.draw();
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(0.01);
+        first.draw();
+        second.draw();
+        third.draw();
+        fourth.draw();
+        System.out.println(rect.distanceSquaredTo(first));
+        System.out.println(rect.distanceSquaredTo(second));
+        System.out.println(rect.distanceSquaredTo(third));
+        System.out.println(rect.distanceSquaredTo(fourth));
     }
 }

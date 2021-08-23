@@ -1,8 +1,8 @@
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -11,7 +11,6 @@ public class KdTree {
 
     private int size;
     private Node root;
-    private static final boolean VERTICAL = true;
     private static final boolean HORIZONTAL = false;
 
     private static class Node {
@@ -169,13 +168,16 @@ public class KdTree {
         if (queryRect.contains(node.p)) {
             pointsInRange.add(node.p);
         }
-        if (queryRect.intersects(node.lb.rect)
+        boolean lbNotNull = node.lb != null;
+        boolean rtNotNull = node.rt != null;
+        boolean bothSidesNotNull = lbNotNull && rtNotNull;
+        if (bothSidesNotNull && queryRect.intersects(node.lb.rect)
                 && queryRect.intersects(node.rt.rect)) {
             range(queryRect, node.lb, pointsInRange);
             range(queryRect, node.rt, pointsInRange);
-        } else if (queryRect.intersects(node.lb.rect)) {
+        } else if (lbNotNull && queryRect.intersects(node.lb.rect)) {
             range(queryRect, node.lb, pointsInRange);
-        } else {
+        } else if (rtNotNull && queryRect.intersects(node.rt.rect)) {
             range(queryRect, node.rt, pointsInRange);
         }
     }
@@ -183,21 +185,52 @@ public class KdTree {
     // a nearest neighbor in the set to point p; null if the set is empty
     public Point2D nearest(Point2D p) {
         validate(p);
-        return nearest(root, p, null, root.p);
+        if (!isEmpty()) {
+            double distance = root.p.distanceSquaredTo(p);
+            return nearest(root, p, root.p, distance);
+        }
+        return null;
     }
 
     private Point2D nearest(Node node, Point2D queryPoint,
-                            RectHV rect, Point2D champ) {
+                            Point2D champ, double minDistance) {
         if (node == null) {
             return champ;
         }
-
-        if (node.lb.rect.contains(queryPoint)) {
-            // go left-bottom
-        } else {
-            // go right-top
+        if (!node.equals(root)) {
+            double currentDistance = node.p.distanceSquaredTo(queryPoint);
+            minDistance = Math.min(minDistance, currentDistance);
+            champ = currentDistance < minDistance ? node.p : champ;
         }
-        return null;
+
+        // go to closer subtree
+        double distanceLb = 1.1d;
+        double distanceRt = 1.1d;
+        if (node.lb != null) {
+            distanceLb = node.lb.rect.distanceSquaredTo(queryPoint);
+        }
+        if (node.rt != null) {
+            distanceRt = node.rt.rect.distanceSquaredTo(queryPoint);
+        }
+
+        if (distanceLb == distanceRt) {
+            return champ;
+        } else if (distanceLb < distanceRt) {
+            champ = nearest(node.lb, queryPoint, champ, minDistance);
+            // check other subtree iff orientation diff is less than current champ
+            if (distanceRt < minDistance) {
+                // check subtree
+                champ = nearest(node.lb, queryPoint, champ, minDistance);
+            }
+        } else { // distanceRt < distanceLb
+            champ = nearest(node.rt, queryPoint, champ, minDistance);
+            // check other subtree iff orientation diff is less than current champ
+            if (distanceLb < minDistance) {
+                // check subtree
+                champ = nearest(node.lb, queryPoint, champ, minDistance);
+            }
+        }
+        return champ;
     }
 
     private void validate(Object arg) {
@@ -207,11 +240,17 @@ public class KdTree {
     }
 
     public static void main(String[] args) {
-        KdTree tree2d = new KdTree();
-        Random r = new Random();
-        for (int i = 0; i < 20; i++) {
-            tree2d.insert(new Point2D(r.nextDouble(), r.nextDouble()));
+        String filename = args[0];
+        In in = new In(filename);
+        KdTree kdtree = new KdTree();
+        while (!in.isEmpty()) {
+            double x = in.readDouble();
+            double y = in.readDouble();
+            Point2D p = new Point2D(x, y);
+            kdtree.insert(p);
         }
-        tree2d.draw();
+        RectHV queryRect = new RectHV(0.24, 0.01, 0.4, 0.58);
+        queryRect.draw();
+        kdtree.draw();
     }
 }
